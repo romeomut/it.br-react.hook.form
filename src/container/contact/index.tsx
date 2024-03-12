@@ -1,3 +1,4 @@
+import { log } from "console";
 import "./index.css";
 
 import { SubmitErrorHandler, SubmitHandler, useForm } from "react-hook-form";
@@ -16,8 +17,34 @@ interface FormType {
 //   value.length === 0 ? "Поле не може бути пустим" : null;
 
 export default function Container() {
-  const { register, formState, handleSubmit, reset } = useForm<FormType>({
-    mode: "onChange",
+  const {
+    register,
+    formState,
+    handleSubmit,
+    reset,
+    resetField,
+    setValue,
+    setFocus,
+    setError,
+    clearErrors,
+    getFieldState,
+    getValues,
+    trigger,
+  } = useForm<FormType>({
+    // mode: "onChange",
+    mode: "onTouched",
+    defaultValues: async () => {
+      return new Promise((resolve, reject) => {
+        setTimeout(
+          () =>
+            resolve({
+              [FIELD_KEY.MESSAGE]: "Message",
+              [FIELD_KEY.NAME]: "Name",
+            }),
+          3000
+        );
+      });
+    },
   });
 
   const onSubmit: SubmitHandler<FormType> = (data) => {
@@ -28,6 +55,8 @@ export default function Container() {
   };
   const onError: SubmitErrorHandler<FormType> = (errors) =>
     console.log("errors", errors);
+
+  console.log(getFieldState(FIELD_KEY.MESSAGE, formState));
 
   return (
     <div className="contact">
@@ -92,6 +121,98 @@ export default function Container() {
 
         {formState.isSubmitting && <span>Loading...</span>}
         <span>Submit count: {formState.submitCount}</span>
+
+        {formState.isLoading && <span>Loading default values...</span>}
+
+        {/* <button
+          className="contact__button"
+          onClick={() => {
+            reset(
+              {
+                [FIELD_KEY.MESSAGE]: "Reset",
+                [FIELD_KEY.NAME]: "Reset",
+              },
+              { keepDirtyValues: true }
+            );
+          }}
+        >
+          Reset
+        </button> */}
+
+        {/* <button
+          className="contact__button"
+          onClick={() => {
+            resetField(FIELD_KEY.MESSAGE, { defaultValue: "new value" });
+          }}
+        >
+          Reset
+        </button> */}
+
+        {/* <button
+          type="button"
+          className="contact__button"
+          onClick={() => {
+            setValue(FIELD_KEY.MESSAGE, "new value", { shouldValidate: true });
+          }}
+        >
+          Reset
+        </button> */}
+
+        {/* <button
+          type="button"
+          className="contact__button"
+          onClick={() => {
+            setFocus(FIELD_KEY.MESSAGE, { shouldSelect: true });
+          }}
+        >
+          Reset
+        </button> */}
+
+        {/* <button
+          type="button"
+          className="contact__button"
+          onClick={() => {
+            setError(
+              FIELD_KEY.MESSAGE,
+              {
+                type: "CustommmmeeeeEror",
+                message: "Test ERROR",
+              },
+              { shouldFocus: true }
+            );
+          }}
+        >
+          Reset
+        </button> */}
+
+        {/* <button
+          type="button"
+          className="contact__button"
+          onClick={() => {
+            clearErrors(FIELD_KEY.MESSAGE);
+          }}
+        >
+          Reset
+        </button> */}
+
+        {/* <button
+          type="button"
+          className="contact__button"
+          onClick={() => console.log(getValues(FIELD_KEY.MESSAGE))}
+        >
+          Reset
+        </button> */}
+
+        <button
+          type="button"
+          className="contact__button"
+          onClick={async () => {
+            const result = await trigger(FIELD_KEY.MESSAGE);
+            console.log(result);
+          }}
+        >
+          Reset
+        </button>
       </form>
     </div>
   );
